@@ -1,0 +1,118 @@
+
+const employeeSchema = require('../model/crud')
+const Insert = async(req,res)=>{
+    try{
+        const {name, email, phone, address,designation,salary} = req.body;
+
+        let checkdesignation = await employeeSchema.findOne({designation});
+        if(checkdesignation){
+            console.log("designation already exits")
+            return res.status(400).json({errors:"designation already exits"})
+        }
+        else{
+        const data = await new employeeSchema({name:name,email:email,phone:phone,address:address,designation:designation,salary:salary});
+        const savedEmployee = await data.save();
+        console.log("Insertion successful")
+        res.send({"Insertion successful":true,savedEmployee});
+    }
+    }
+    catch(error){
+        console.error("some error Occured"+error);
+        res.status(500).json("some internal error!!!")
+    }
+}
+
+const View = async(req, res)=>{
+    try{
+        const data = await employeeSchema.find();
+        console.log(data)
+        res.json(data)
+    }
+    catch(error){
+        console.error("some erroroccured"+error);
+        res.status(500).json("Some internal error!!!")
+    }
+}
+
+const Delete = async(req, res)=>{
+    try{
+        let data = await employeeSchema.findById(req.params.id);
+        if(!data){
+            console.log("Data is not found with this ID")
+            return res.status(404).send("Data does not exist with this ID")
+        }else{
+            data = await employeeSchema.findByIdAndDelete(req.params.id)
+            console.log("Data deleted successfully")
+            res.json({"success":"Deleted successfully", "Deleted Data":data})
+        }
+
+
+    }
+    catch(error){
+        console.error("some erroroccured"+error);
+        res.status(500).json("Some internal error!!!")
+    }
+}
+
+
+const singleView = async(req, res)=>{
+    try{
+        let dataa = await crud.findById(req.params.id);
+        console.log(dataa)
+        res.json(dataa)
+    }
+    catch(error){
+            console.error("some erroroccured"+error);
+            res.status(500).json("Some internal error!!!")
+        }
+}
+
+
+const Update = async(req, res)=>{
+    const {name, email, phone, address,designation,salary} = req.body;
+    try{
+       const newdata = {}
+       if(name){newdata.name=name}
+       if(email){newdata.email=email}
+       if(phone){newdata.phone=phone}
+       if(address){newdata.address=address}
+       if(designation){newdata.designation=designation}
+       if(salary){newdata.salary=salary}
+       let data = await crud.findById(req.params.id);
+       if(!data){
+        console.log("Data is not found with this ID")
+        return res.status(404).send("Data does not exist with this ID")
+    }else{
+        data = await crud.findByIdAndUpdate(req.params.id,{$set:newdata})
+        res.json((data))
+    }
+}
+    catch(error){
+        console.error("some erroroccured"+error);
+        res.status(500).json("Some internal error!!!")
+    }
+}
+
+
+const Register = async(req,res)=>{
+    const {name, email, phone, password} = req.body;
+    try{
+        let checkemail = await employeeSchema.findOne({email});
+        if(checkemail){
+            console.log("Email already exits")
+            return res.status(400).json({errors:"Email already exits"})
+        }
+        else{
+        const data = await new employeeSchema({name,email,phone,password});
+        const savedEmployee = await data.save();
+        console.log("Insertion successful")
+        res.send({"Insertion successful":true,savedEmployee});
+    }
+    }
+    catch(error){
+        console.error("some error Occured"+error);
+        res.status(500).json("some internal error!!!")
+    }
+    }  
+
+module.exports = {Insert, View, Delete, singleView, Update, Register };
