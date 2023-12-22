@@ -1,3 +1,4 @@
+// this is backend code
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
 const mySchema = new Schema({
